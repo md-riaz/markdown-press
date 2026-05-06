@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subscriber extends Model
 {
-    //
+    protected $fillable = ['name', 'email', 'status', 'token', 'subscribed_at', 'unsubscribed_at'];
+
+    protected $casts = [
+        'subscribed_at'   => 'datetime',
+        'unsubscribed_at' => 'datetime',
+    ];
 }

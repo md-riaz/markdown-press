@@ -21,7 +21,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
     }
 
@@ -29,6 +29,12 @@ class User extends Authenticatable
     public function isEditor(): bool { return $this->role === 'editor'; }
     public function isAuthor(): bool { return $this->role === 'author'; }
     public function canEditAnyPost(): bool { return in_array($this->role, ['admin', 'editor']); }
+
+    // Filament requirement
+    public function canAccessPanel(\Filament\Panel $panel): bool
+    {
+        return $this->isAdmin();
+    }
 
     public function posts(): HasMany { return $this->hasMany(Post::class); }
     public function revisions(): HasMany { return $this->hasMany(Revision::class); }

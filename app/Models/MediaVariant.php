@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class MediaVariant extends Model
 {
-    protected $fillable = ['media_id','variant_name','disk','path','mime_type','size','width','height'];
+    protected $fillable = ['media_id', 'variant_name', 'disk', 'path', 'mime_type', 'size', 'width', 'height'];
 
     public function media(): BelongsTo { return $this->belongsTo(Media::class); }
 

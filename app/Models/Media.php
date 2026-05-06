@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Storage;
 class Media extends Model
 {
     protected $fillable = [
-        'user_id','filename','disk','path','mime_type','size',
-        'width','height','alt_text','is_starred','collection',
+        'user_id', 'filename', 'disk', 'path', 'mime_type', 'size',
+        'width', 'height', 'alt_text', 'is_starred', 'collection',
     ];
 
     protected $casts = ['is_starred' => 'boolean'];
