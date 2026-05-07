@@ -1,0 +1,19 @@
+{
+  "key": "hello-world",
+  "name": "Hello World",
+  "author": "MarkdownPress Team",
+  "version": "1.0.0",
+  "description": "A clean, typography-first single-column blog theme.",
+  "supports": ["index", "post", "category", "tag", "author"],
+  "colors": {
+    "primary": "#4f46e5",
+    "accent": "#10b981",
+    "background": "#f8fafc",
+    "text": "#0f172a"
+  },
+  "fonts": {
+    "default": "Inter",
+    "ar": "Noto Sans Arabic",
+    "bn": "Noto Sans Bengali"
+  }
+}

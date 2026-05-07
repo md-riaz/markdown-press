@@ -1,8 +1,11 @@
 <?php
 namespace App\Filament\Resources;
+
 use App\Filament\Resources\ThemeResource\Pages;
 use App\Models\Theme;
+use App\Modules\Theme\ThemeRegistry;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -31,7 +34,23 @@ class ThemeResource extends Resource
             Tables\Columns\TextColumn::make('slug'),
             Tables\Columns\IconColumn::make('is_active')->boolean()->label('Active'),
             Tables\Columns\IconColumn::make('is_default')->boolean()->label('Default'),
-        ])->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
+        ])->actions([
+            Tables\Actions\Action::make('activate')
+                ->icon('heroicon-o-check-circle')
+                ->color('success')
+                ->requiresConfirmation()
+                ->visible(fn (Theme $record): bool => ! $record->is_active)
+                ->action(function (Theme $record): void {
+                    app(ThemeRegistry::class)->activate($record);
+
+                    Notification::make()
+                        ->title("Activated theme: {$record->name}")
+                        ->success()
+                        ->send();
+                }),
+            Tables\Actions\EditAction::make(),
+            Tables\Actions\DeleteAction::make(),
+        ])
           ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 

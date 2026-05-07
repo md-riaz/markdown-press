@@ -10,6 +10,7 @@ use App\Models\ShortcodeRegistry;
 use App\Models\Tag;
 use App\Models\Theme;
 use App\Models\User;
+use App\Modules\Theme\ThemeRegistry;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -63,21 +64,31 @@ class DatabaseSeeder extends Seeder
 
         // ── Theme ─────────────────────────────────────────────────────────────
 
-        Theme::create([
-            'name'        => 'Hello World',
-            'slug'        => 'hello-world',
-            'description' => 'Clean and minimal starter theme.',
-            'is_active'   => true,
-            'is_default'  => true,
-            'config'      => [
-                'colors' => [
-                    'primary'    => '#6366f1',
-                    'accent'     => '#10b981',
-                    'background' => '#ffffff',
-                    'text'       => '#1f2937',
-                ],
-            ],
-        ]);
+        /** @var ThemeRegistry $registry */
+        $registry = app(ThemeRegistry::class);
+        $themes   = $registry->discover();
+
+        if ($themes->isEmpty()) {
+            $themes = collect([
+                Theme::create([
+                    'name'        => 'Hello World',
+                    'slug'        => 'hello-world',
+                    'description' => 'Clean and minimal starter theme.',
+                    'config'      => [
+                        'key'    => 'hello-world',
+                        'name'   => 'Hello World',
+                        'author' => 'MarkdownPress Team',
+                        'version' => '1.0.0',
+                    ],
+                ]),
+            ]);
+        }
+
+        Theme::query()->update(['is_active' => false, 'is_default' => false]);
+        $defaultTheme = $themes->firstWhere('slug', config('theme.default_theme', 'hello-world')) ?? $themes->first();
+        if ($defaultTheme) {
+            $defaultTheme->update(['is_active' => true, 'is_default' => true]);
+        }
 
         // ── Settings ──────────────────────────────────────────────────────────
 
