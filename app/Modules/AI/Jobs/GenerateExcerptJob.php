@@ -15,7 +15,8 @@ class GenerateExcerptJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $timeout = 120;
-    public int $tries   = 3;
+
+    public int $tries = 3;
 
     public function __construct(private Post $post, private int $words = 50) {}
 

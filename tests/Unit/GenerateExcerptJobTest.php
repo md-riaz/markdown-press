@@ -21,10 +21,22 @@ class GenerateExcerptJobTest extends TestCase
             'meta_description' => null,
         ]);
 
-        $ai = new class implements AIDriverContract {
-            public function summarize(string $markdown): string { return 'summary'; }
-            public function excerpt(string $markdown, int $words = 50): string { return "excerpt {$words}"; }
-            public function translate(string $markdown, string $targetLocale, string $sourceLocale = 'en'): string { return 'translated'; }
+        $ai = new class implements AIDriverContract
+        {
+            public function summarize(string $markdown): string
+            {
+                return 'summary';
+            }
+
+            public function excerpt(string $markdown, int $words = 50): string
+            {
+                return "excerpt {$words}";
+            }
+
+            public function translate(string $markdown, string $targetLocale, string $sourceLocale = 'en'): string
+            {
+                return 'translated';
+            }
         };
 
         (new GenerateExcerptJob($post, 42))->handle($ai);

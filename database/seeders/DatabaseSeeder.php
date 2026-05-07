@@ -21,21 +21,21 @@ class DatabaseSeeder extends Seeder
         // ── Users ─────────────────────────────────────────────────────────────
 
         $admin = User::factory()->create([
-            'name'     => 'Admin User',
-            'email'    => 'admin@markdownpress.test',
+            'name' => 'Admin User',
+            'email' => 'admin@markdownpress.test',
             'password' => Hash::make('password'),
-            'role'     => 'admin',
+            'role' => 'admin',
             'username' => 'admin',
-            'bio'      => 'Platform administrator and chief editor.',
+            'bio' => 'Platform administrator and chief editor.',
         ]);
 
         $editor = User::factory()->create([
-            'name'     => 'Editor User',
-            'email'    => 'editor@markdownpress.test',
+            'name' => 'Editor User',
+            'email' => 'editor@markdownpress.test',
             'password' => Hash::make('password'),
-            'role'     => 'editor',
+            'role' => 'editor',
             'username' => 'editor',
-            'bio'      => 'Senior content editor.',
+            'bio' => 'Senior content editor.',
         ]);
 
         $authors = User::factory(3)->create(['role' => 'author']);
@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
         // ── Taxonomy ──────────────────────────────────────────────────────────
 
         $categories = Category::factory(8)->create();
-        $tags        = Tag::factory(20)->create();
+        $tags = Tag::factory(20)->create();
 
         // ── Posts ─────────────────────────────────────────────────────────────
 
@@ -66,17 +66,17 @@ class DatabaseSeeder extends Seeder
 
         /** @var ThemeRegistry $registry */
         $registry = app(ThemeRegistry::class);
-        $themes   = $registry->discover();
+        $themes = $registry->discover();
 
         if ($themes->isEmpty()) {
             $themes = collect([
                 Theme::create([
-                    'name'        => 'Hello World',
-                    'slug'        => 'hello-world',
+                    'name' => 'Hello World',
+                    'slug' => 'hello-world',
                     'description' => 'Clean and minimal starter theme.',
-                    'config'      => [
-                        'key'    => 'hello-world',
-                        'name'   => 'Hello World',
+                    'config' => [
+                        'key' => 'hello-world',
+                        'name' => 'Hello World',
                         'author' => 'MarkdownPress Team',
                         'version' => '1.0.0',
                     ],
@@ -92,9 +92,9 @@ class DatabaseSeeder extends Seeder
 
         // ── Settings ──────────────────────────────────────────────────────────
 
-        Setting::set('general', 'site_name',        'MarkdownPress');
-        Setting::set('general', 'site_description',  'A Markdown-first blogging CMS built on Laravel.');
-        Setting::set('seo',     'default_meta_description', 'Read the latest articles on MarkdownPress.');
+        Setting::set('general', 'site_name', 'MarkdownPress');
+        Setting::set('general', 'site_description', 'A Markdown-first blogging CMS built on Laravel.');
+        Setting::set('seo', 'default_meta_description', 'Read the latest articles on MarkdownPress.');
 
         // ── Shortcode Registry ────────────────────────────────────────────────
 

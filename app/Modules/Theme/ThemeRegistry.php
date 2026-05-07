@@ -10,7 +10,7 @@ use InvalidArgumentException;
 class ThemeRegistry
 {
     /**
-     * Discover themes from resources/themes/*/theme.json and upsert them into the database.
+     * Discover themes from theme manifest files and upsert them into the database.
      */
     public function discover(): Collection
     {
@@ -63,8 +63,8 @@ class ThemeRegistry
         return Theme::updateOrCreate(
             ['slug' => $slug],
             [
-                'name'           => $manifest['name'],
-                'description'    => $manifest['description'] ?? null,
+                'name' => $manifest['name'],
+                'description' => $manifest['description'] ?? null,
                 'thumbnail_path' => File::isFile($dir.'/screenshot.png')
                     ? str_replace(resource_path().DIRECTORY_SEPARATOR, '', $dir.'/screenshot.png')
                     : null,
