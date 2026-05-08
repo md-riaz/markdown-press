@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Providers;
+
+use App\Contracts\AIDriverContract;
+use App\Contracts\MediaStorageContract;
+use App\Contracts\ThemeRendererContract;
+use App\Modules\AI\GeminiDriver;
+use App\Modules\AI\QwenDriver;
+use App\Modules\Media\MediaService;
+use App\Modules\Shortcode\ShortcodeRegistry;
+use App\Modules\Theme\ThemeRenderer;
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        // AI Driver
+        $this->app->bind(AIDriverContract::class, function ($app) {
+            return match (config('ai.default_driver', 'gemini')) {
+                'qwen'  => $app->make(QwenDriver::class),
+                default => $app->make(GeminiDriver::class),
+            };
+        });
+
+        // Shortcode Registry (singleton — handlers registered once)
+        $this->app->singleton(ShortcodeRegistry::class, function ($app) {
+            $registry = new ShortcodeRegistry();
+            foreach (config('shortcodes.handlers', []) as $name => $class) {
+                if (class_exists($class)) {
+                    $registry->register($app->make($class));
+                }
+            }
+            return $registry;
+        });
+
+        // Media
+        $this->app->bind(MediaStorageContract::class, MediaService::class);
+
+        // Theme
+        $this->app->bind(ThemeRendererContract::class, ThemeRenderer::class);
+    }
+
+    public function boot(): void
+    {
+        //
+    }
+}

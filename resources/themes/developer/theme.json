@@ -1,0 +1,19 @@
+{
+  "key": "developer",
+  "name": "Developer",
+  "author": "MarkdownPress Team",
+  "version": "1.0.0",
+  "description": "Dark mode default, code-focused layout with technical typography.",
+  "supports": ["index", "post", "category", "tag", "author"],
+  "colors": {
+    "primary": "#22d3ee",
+    "accent": "#a78bfa",
+    "background": "#0b1020",
+    "text": "#e2e8f0"
+  },
+  "fonts": {
+    "default": "JetBrains Mono",
+    "ar": "Noto Sans Arabic",
+    "bn": "Noto Sans Bengali"
+  }
+}

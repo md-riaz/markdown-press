@@ -1,0 +1,19 @@
+{
+  "key": "monolith",
+  "name": "Monolith",
+  "author": "MarkdownPress Team",
+  "version": "1.0.0",
+  "description": "Magazine-style layout with visual hierarchy and featured content emphasis.",
+  "supports": ["index", "post", "category", "tag", "author"],
+  "colors": {
+    "primary": "#0f766e",
+    "accent": "#f59e0b",
+    "background": "#ffffff",
+    "text": "#111827"
+  },
+  "fonts": {
+    "default": "Source Sans 3",
+    "ar": "Noto Sans Arabic",
+    "bn": "Noto Sans Bengali"
+  }
+}
