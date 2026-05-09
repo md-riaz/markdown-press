@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'auth.apitoken' => \App\Http\Middleware\ApiTokenAuth::class,
+            'role'          => \App\Http\Middleware\EnsureUserHasRole::class,
+            'locale'        => \App\Http\Middleware\LocaleMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

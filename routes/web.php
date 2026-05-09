@@ -29,6 +29,16 @@ Route::get('/newsletter/unsubscribe/{token}',  [SubscribeController::class, 'uns
 // Comments
 Route::post('/posts/{slug}/comments', [CommentController::class, 'store'])->name('comments.store');
 
+Route::get('/media/{id}/{variant}', [App\Http\Controllers\Web\MediaVariantController::class, 'show'])->name('media.variant');
+
+Route::get('/health', function () {
+    $checks = [];
+    try { \Illuminate\Support\Facades\DB::select('SELECT 1'); $checks['database'] = 'ok'; } catch (\Throwable $e) { $checks['database'] = 'fail'; }
+    try { \Illuminate\Support\Facades\Cache::put('health_check', 1, 10); \Illuminate\Support\Facades\Cache::get('health_check'); $checks['cache'] = 'ok'; } catch (\Throwable $e) { $checks['cache'] = 'fail'; }
+    $allOk = collect($checks)->every(fn($v) => $v === 'ok');
+    return response()->json(['status' => $allOk ? 'ok' : 'degraded', 'checks' => $checks], $allOk ? 200 : 503);
+})->name('health');
+
 // Single post (must be last)
 Route::get('/{slug}',         [PostController::class, 'show'])->name('post.show');
 Route::post('/{slug}/unlock', [PostController::class, 'unlock'])->name('post.unlock');

@@ -47,6 +47,12 @@ class BuildOrchestrator
                 $fileCount++;
             }
 
+            // Copy theme assets
+            $assetsDir = public_path("themes/{$theme->slug}");
+            if (is_dir($assetsDir)) {
+                \Illuminate\Support\Facades\File::copyDirectory($assetsDir, "{$tmpDir}/assets");
+            }
+
             // Create ZIP
             $zipPath = "builds/build_{$build->id}.zip";
             $zipAbsolute = storage_path("app/{$zipPath}");
