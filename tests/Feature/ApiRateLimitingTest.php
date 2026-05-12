@@ -87,6 +87,26 @@ class ApiRateLimitingTest extends TestCase
             ->assertHeader('Retry-After');
     }
 
+    public function test_failed_auth_token_attempts_also_count_toward_the_rate_limit(): void
+    {
+        for ($attempt = 1; $attempt <= 5; $attempt++) {
+            $this->postJson('/api/v1/auth/token', [
+                'email' => $this->user->email,
+                'password' => 'wrong-password',
+                'token_name' => "invalid-{$attempt}",
+            ])->assertStatus(401)
+                ->assertHeader('X-RateLimit-Limit', '5');
+        }
+
+        $this->postJson('/api/v1/auth/token', [
+            'email' => $this->user->email,
+            'password' => 'password',
+            'token_name' => 'still-blocked',
+        ])->assertStatus(429)
+            ->assertHeader('X-RateLimit-Limit', '5')
+            ->assertHeader('Retry-After');
+    }
+
     private function authHeaders(): array
     {
         return ['Authorization' => "Bearer {$this->rawToken}"];
