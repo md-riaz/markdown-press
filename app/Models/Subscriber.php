@@ -8,6 +8,8 @@ use RuntimeException;
 
 class Subscriber extends Model
 {
+    private const MAX_TOKEN_GENERATION_ATTEMPTS = 5;
+
     protected $fillable = ['name', 'email', 'status', 'token', 'subscribed_at', 'unsubscribed_at'];
 
     protected $casts = [
@@ -31,7 +33,7 @@ class Subscriber extends Model
 
     public static function generateUniqueToken(): string
     {
-        for ($attempt = 0; $attempt < 5; $attempt++) {
+        for ($attempt = 0; $attempt < self::MAX_TOKEN_GENERATION_ATTEMPTS; $attempt++) {
             $token = Str::random(64);
 
             if (! static::where('token', $token)->exists()) {

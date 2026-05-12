@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Mail\NewsletterSubscriptionConfirmed;
 use App\Models\Subscriber;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class NewsletterService
@@ -15,19 +16,21 @@ class NewsletterService
         ]);
         $shouldResetSubscriptionDate = ! $subscriber->exists || $subscriber->status === 'unsubscribed';
 
-        $subscriber->fill([
-            'name' => $name ?: $subscriber->name,
-            'status' => 'active',
-            'token' => $subscriber->token ?: Subscriber::generateUniqueToken(),
-            'subscribed_at' => $shouldResetSubscriptionDate ? now() : $subscriber->subscribed_at,
-            'unsubscribed_at' => null,
-        ]);
+        return DB::transaction(function () use ($name, $shouldResetSubscriptionDate, $subscriber): Subscriber {
+            $subscriber->fill([
+                'name' => $name ?: $subscriber->name,
+                'status' => 'active',
+                'token' => $subscriber->token ?: Subscriber::generateUniqueToken(),
+                'subscribed_at' => $shouldResetSubscriptionDate ? now() : $subscriber->subscribed_at,
+                'unsubscribed_at' => null,
+            ]);
 
-        $subscriber->save();
+            $subscriber->save();
 
-        Mail::to($subscriber->email, $subscriber->name)->send(new NewsletterSubscriptionConfirmed($subscriber));
+            Mail::to($subscriber->email, $subscriber->name)->send(new NewsletterSubscriptionConfirmed($subscriber));
 
-        return $subscriber->fresh();
+            return $subscriber->fresh();
+        });
     }
 
     public function unsubscribe(string $token): Subscriber

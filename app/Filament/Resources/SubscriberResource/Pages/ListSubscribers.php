@@ -30,22 +30,26 @@ class ListSubscribers extends ListRecords
         return response()->streamDownload(function (): void {
             $handle = fopen('php://output', 'wb');
 
-            fputcsv($handle, ['Name', 'Email', 'Status', 'Subscribed At', 'Unsubscribed At']);
+            try {
+                fputcsv($handle, ['Name', 'Email', 'Status', 'Subscribed At', 'Unsubscribed At']);
 
-            Subscriber::query()
-                ->orderByDesc('subscribed_at')
-                ->orderBy('email')
-                ->each(function (Subscriber $subscriber) use ($handle): void {
-                    fputcsv($handle, [
-                        $this->sanitizeCsvValue($subscriber->name),
-                        $this->sanitizeCsvValue($subscriber->email),
-                        $subscriber->status,
-                        $subscriber->subscribed_at?->toDateTimeString(),
-                        $subscriber->unsubscribed_at?->toDateTimeString(),
-                    ]);
-                });
-
-            fclose($handle);
+                Subscriber::query()
+                    ->orderByDesc('subscribed_at')
+                    ->orderBy('email')
+                    ->each(function (Subscriber $subscriber) use ($handle): void {
+                        fputcsv($handle, [
+                            $this->sanitizeCsvValue($subscriber->name),
+                            $this->sanitizeCsvValue($subscriber->email),
+                            $subscriber->status,
+                            $subscriber->subscribed_at?->toDateTimeString(),
+                            $subscriber->unsubscribed_at?->toDateTimeString(),
+                        ]);
+                    });
+            } finally {
+                if (is_resource($handle)) {
+                    fclose($handle);
+                }
+            }
         }, $filename, [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
