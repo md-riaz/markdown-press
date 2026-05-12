@@ -41,7 +41,7 @@ class PostCrudTest extends TestCase
             'title'            => 'My New Post',
             'content_markdown' => '# Hello',
             'status'           => 'draft',
-        ], $this->withToken());
+        ], $this->authHeaders());
 
         $response->assertStatus(201);
         $response->assertJsonPath('data.title', 'My New Post');
@@ -70,7 +70,7 @@ class PostCrudTest extends TestCase
 
         $response = $this->putJson("/api/v1/posts/{$post->slug}", [
             'title' => 'Updated Title',
-        ], $this->withToken());
+        ], $this->authHeaders());
 
         $response->assertStatus(200);
         $response->assertJsonPath('data.title', 'Updated Title');
@@ -83,7 +83,7 @@ class PostCrudTest extends TestCase
             'status'  => 'draft',
         ]);
 
-        $response = $this->deleteJson("/api/v1/posts/{$post->slug}", [], $this->withToken());
+        $response = $this->deleteJson("/api/v1/posts/{$post->slug}", [], $this->authHeaders());
         $response->assertStatus(200);
         $this->assertSoftDeleted('posts', ['id' => $post->id]);
     }
