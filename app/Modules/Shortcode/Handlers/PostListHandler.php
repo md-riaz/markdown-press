@@ -7,6 +7,10 @@ use App\Models\Post;
 
 class PostListHandler implements ShortcodeHandlerContract
 {
+    private const MIN_LIMIT = 1;
+    private const MAX_LIMIT = 50;
+    private const DEFAULT_LIMIT = 5;
+
     public function name(): string
     {
         return 'post_list';
@@ -14,7 +18,10 @@ class PostListHandler implements ShortcodeHandlerContract
 
     public function render(array $attributes, ?string $content): string
     {
-        $limit = max(1, min(50, (int) ($attributes['limit'] ?? 5)));
+        $limit = max(
+            self::MIN_LIMIT,
+            min(self::MAX_LIMIT, (int) ($attributes['limit'] ?? self::DEFAULT_LIMIT))
+        );
         $category = $attributes['category'] ?? null;
 
         $query = Post::query()
