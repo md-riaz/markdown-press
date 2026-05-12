@@ -57,7 +57,7 @@ class AppServiceProvider extends ServiceProvider
             $identifier = $request->bearerToken() ?? $request->header('X-API-Token');
 
             if ($identifier === null) {
-                return Limit::perMinute(5)->by(ApiRateLimitKey::missingAuthenticatedToken($request->ip()));
+                return Limit::perMinute(10)->by(ApiRateLimitKey::missingAuthenticatedToken($request->ip()));
             }
 
             return Limit::perMinute(300)->by(ApiRateLimitKey::authenticated($identifier));
