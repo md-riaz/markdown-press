@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MediaResource;
 use App\Modules\Media\MediaService;
 use App\Models\Media;
 use Illuminate\Http\JsonResponse;
@@ -11,6 +12,13 @@ use Illuminate\Http\Request;
 class MediaController extends Controller
 {
     public function __construct(private MediaService $media) {}
+
+    public function show(int $id): MediaResource
+    {
+        $media = Media::with('user')->findOrFail($id);
+
+        return new MediaResource($media);
+    }
 
     public function store(Request $request): JsonResponse
     {

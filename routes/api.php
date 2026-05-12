@@ -16,6 +16,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     // Auth
     Route::post('/auth/token',  [AuthController::class, 'token'])->name('auth.token');
     Route::post('/auth/revoke', [AuthController::class, 'revoke'])->middleware('auth.apitoken')->name('auth.revoke');
+    Route::get('/auth/tokens',  [AuthController::class, 'tokens'])->middleware('auth.apitoken')->name('auth.tokens');
 
     // Public read
     Route::get('/posts',                     [PostController::class, 'index']);
@@ -27,6 +28,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::get('/tags/{slug}',               [TagController::class, 'show']);
     Route::get('/authors',                   [AuthorController::class, 'index']);
     Route::get('/authors/{username}',        [AuthorController::class, 'show']);
+    Route::get('/media/{id}',                [MediaController::class, 'show']);
 
     // Protected
     Route::middleware('auth.apitoken')->group(function () {

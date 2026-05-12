@@ -8,4 +8,7 @@
 - [x] Return HTTP 201 for successful post creation API endpoint
 - [x] Validate with `php artisan migrate:fresh --seed --force`
 - [x] Validate with `php artisan test`
-- [ ] Continue next roadmap slice (API parity, security hardening, and admin completion)
+- [x] Implement `GET /api/v1/auth/tokens` for authenticated token listing
+- [x] Implement `GET /api/v1/media/{id}` for public media metadata
+- [x] Add feature coverage for API token listing and media metadata endpoints
+- [ ] Continue next roadmap slice (security hardening, newsletter API parity, and admin completion)
