@@ -53,7 +53,12 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('api-authenticated', function (Request $request) {
-            $identifier = $request->bearerToken() ?? $request->header('X-API-Token') ?? 'ip:'.$request->ip();
+            $identifier = $request->bearerToken() ?? $request->header('X-API-Token');
+
+            if ($identifier === null) {
+                return Limit::perMinute(300)->by('api:missing-token:'.$request->ip());
+            }
+
             $hashedIdentifier = hash('sha256', $identifier);
 
             return Limit::perMinute(300)->by('api:token:'.$hashedIdentifier);

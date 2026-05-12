@@ -6,6 +6,7 @@ use App\Models\ApiToken;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -21,7 +22,9 @@ class ApiRateLimitingTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
+        $this->user = User::factory()->create([
+            'password' => Hash::make('password'),
+        ]);
         $this->rawToken = Str::random(64);
 
         ApiToken::create([
