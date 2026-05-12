@@ -19,37 +19,33 @@ class Subscriber extends Model
         static::creating(function (Subscriber $subscriber): void {
             $subscriber->email = Str::lower(trim($subscriber->email));
             $subscriber->token ??= static::generateUniqueToken();
-
-            if ($subscriber->status === 'unsubscribed') {
-                $subscriber->unsubscribed_at ??= now();
-
-                return;
-            }
-
-            $subscriber->subscribed_at ??= now();
-            $subscriber->unsubscribed_at = null;
+            static::syncLifecycleState($subscriber);
         });
 
         static::saving(function (Subscriber $subscriber): void {
             $subscriber->email = Str::lower(trim($subscriber->email));
-
-            if ($subscriber->status === 'unsubscribed') {
-                $subscriber->unsubscribed_at ??= now();
-
-                return;
-            }
-
-            $subscriber->subscribed_at ??= now();
-            $subscriber->unsubscribed_at = null;
+            static::syncLifecycleState($subscriber);
         });
     }
 
-    private static function generateUniqueToken(): string
+    public static function generateUniqueToken(): string
     {
         do {
             $token = Str::random(64);
         } while (static::where('token', $token)->exists());
 
         return $token;
+    }
+
+    private static function syncLifecycleState(Subscriber $subscriber): void
+    {
+        if ($subscriber->status === 'unsubscribed') {
+            $subscriber->unsubscribed_at ??= now();
+
+            return;
+        }
+
+        $subscriber->subscribed_at ??= now();
+        $subscriber->unsubscribed_at = null;
     }
 }

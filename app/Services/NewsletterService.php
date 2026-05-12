@@ -17,7 +17,7 @@ class NewsletterService
         $subscriber->fill([
             'name' => $name ?: $subscriber->name,
             'status' => 'active',
-            'token' => $this->generateUniqueToken(),
+            'token' => $subscriber->token ?: Subscriber::generateUniqueToken(),
             'subscribed_at' => now(),
             'unsubscribed_at' => null,
         ]);
@@ -80,14 +80,5 @@ class NewsletterService
         }
 
         return $result;
-    }
-
-    private function generateUniqueToken(): string
-    {
-        do {
-            $token = Str::random(64);
-        } while (Subscriber::where('token', $token)->exists());
-
-        return $token;
     }
 }
