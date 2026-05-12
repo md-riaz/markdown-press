@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\ApiToken;
 use App\Models\Post;
 use App\Models\User;
+use App\Support\ApiRateLimitKey;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
@@ -63,7 +64,7 @@ class ApiRateLimitingTest extends TestCase
             ->assertOk()
             ->assertHeader('X-RateLimit-Limit', '300');
 
-        $limiterKey = md5('api-authenticated'.'api:token:'.hash('sha256', $this->rawToken));
+        $limiterKey = md5('api-authenticated'.ApiRateLimitKey::authenticated($this->rawToken));
 
         RateLimiter::clear($limiterKey);
         RateLimiter::increment($limiterKey, 60, 300);
