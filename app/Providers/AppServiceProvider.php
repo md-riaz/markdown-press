@@ -10,7 +10,6 @@ use App\Modules\AI\QwenDriver;
 use App\Modules\Media\MediaService;
 use App\Modules\Shortcode\ShortcodeRegistry;
 use App\Modules\Theme\ThemeRenderer;
-use App\Support\ApiRateLimitKey;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -51,16 +50,6 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('api-public', function (Request $request) {
             return Limit::perMinute(60)->by('api:public:'.$request->ip());
-        });
-
-        RateLimiter::for('api-authenticated', function (Request $request) {
-            $identifier = $request->bearerToken() ?? $request->header('X-API-Token');
-
-            if ($identifier === null) {
-                return Limit::perMinute(10)->by(ApiRateLimitKey::missingAuthenticatedToken($request->ip()));
-            }
-
-            return Limit::perMinute(300)->by(ApiRateLimitKey::authenticated($identifier));
         });
 
         RateLimiter::for('auth-token', function (Request $request) {

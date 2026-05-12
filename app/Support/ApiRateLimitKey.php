@@ -13,9 +13,4 @@ class ApiRateLimitKey
     {
         return 'api:missing-token:'.$ip;
     }
-
-    public static function namedLimiter(string $limiterName, string $key): string
-    {
-        return md5($limiterName.$key);
-    }
 }

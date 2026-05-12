@@ -16,8 +16,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // Auth
     Route::post('/auth/token', [AuthController::class, 'token'])->middleware('throttle:auth-token')->name('auth.token');
-    Route::post('/auth/revoke', [AuthController::class, 'revoke'])->middleware(['auth.apitoken', 'throttle:api-authenticated'])->name('auth.revoke');
-    Route::get('/auth/tokens', [AuthController::class, 'tokens'])->middleware(['auth.apitoken', 'throttle:api-authenticated'])->name('auth.tokens');
+    Route::post('/auth/revoke', [AuthController::class, 'revoke'])->middleware(['auth.apitoken', 'auth.api.throttle'])->name('auth.revoke');
+    Route::get('/auth/tokens', [AuthController::class, 'tokens'])->middleware(['auth.apitoken', 'auth.api.throttle'])->name('auth.tokens');
 
     // Public read
     Route::middleware('throttle:api-public')->group(function () {
@@ -34,7 +34,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     });
 
     // Protected
-    Route::middleware(['auth.apitoken', 'throttle:api-authenticated'])->group(function () {
+    Route::middleware(['auth.apitoken', 'auth.api.throttle'])->group(function () {
         // Posts CRUD
         Route::post('/posts', [PostController::class, 'store']);
         Route::put('/posts/{slug}', [PostController::class, 'update']);
