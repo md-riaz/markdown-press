@@ -13,4 +13,6 @@
 - [x] Add feature coverage for API token listing and media metadata endpoints
 - [x] Implement newsletter service plus `POST /api/v1/newsletter/subscribe` and `DELETE /api/v1/newsletter/unsubscribe`
 - [x] Complete `SubscriberResource` CSV export and unsubscribe actions
-- [ ] Continue next roadmap slice (security hardening and remaining admin completion)
+- [x] Apply docs-based API rate limiting for public, authenticated, and auth token routes
+- [x] Add feature coverage for API and auth rate limiting responses
+- [ ] Continue next roadmap slice (security hardening headers and remaining admin completion)

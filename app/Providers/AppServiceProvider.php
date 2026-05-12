@@ -10,6 +10,9 @@ use App\Modules\AI\QwenDriver;
 use App\Modules\Media\MediaService;
 use App\Modules\Shortcode\ShortcodeRegistry;
 use App\Modules\Theme\ThemeRenderer;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,19 +22,20 @@ class AppServiceProvider extends ServiceProvider
         // AI Driver
         $this->app->bind(AIDriverContract::class, function ($app) {
             return match (config('ai.default_driver', 'gemini')) {
-                'qwen'  => $app->make(QwenDriver::class),
+                'qwen' => $app->make(QwenDriver::class),
                 default => $app->make(GeminiDriver::class),
             };
         });
 
         // Shortcode Registry (singleton — handlers registered once)
         $this->app->singleton(ShortcodeRegistry::class, function ($app) {
-            $registry = new ShortcodeRegistry();
+            $registry = new ShortcodeRegistry;
             foreach (config('shortcodes.handlers', []) as $name => $class) {
                 if (class_exists($class)) {
                     $registry->register($app->make($class));
                 }
             }
+
             return $registry;
         });
 
@@ -44,10 +48,18 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        \Illuminate\Support\Facades\RateLimiter::for('api', function (\Illuminate\Http\Request $request) {
-            return $request->user()
-                ? \Illuminate\Cache\RateLimiting\Limit::perMinute(300)->by($request->user()->id)
-                : \Illuminate\Cache\RateLimiting\Limit::perMinute(60)->by($request->ip());
+        RateLimiter::for('api-public', function (Request $request) {
+            return Limit::perMinute(60)->by('api:public:'.$request->ip());
+        });
+
+        RateLimiter::for('api-authenticated', function (Request $request) {
+            $rawToken = $request->bearerToken() ?? $request->header('X-API-Token') ?? $request->ip();
+
+            return Limit::perMinute(300)->by('api:token:'.hash('sha256', $rawToken));
+        });
+
+        RateLimiter::for('auth-token', function (Request $request) {
+            return Limit::perMinute(5)->by('auth-token:'.$request->ip());
         });
     }
 }

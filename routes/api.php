@@ -15,24 +15,26 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // Auth
-    Route::post('/auth/token', [AuthController::class, 'token'])->name('auth.token');
-    Route::post('/auth/revoke', [AuthController::class, 'revoke'])->middleware('auth.apitoken')->name('auth.revoke');
-    Route::get('/auth/tokens', [AuthController::class, 'tokens'])->middleware('auth.apitoken')->name('auth.tokens');
+    Route::post('/auth/token', [AuthController::class, 'token'])->middleware('throttle:auth-token')->name('auth.token');
+    Route::post('/auth/revoke', [AuthController::class, 'revoke'])->middleware(['auth.apitoken', 'throttle:api-authenticated'])->name('auth.revoke');
+    Route::get('/auth/tokens', [AuthController::class, 'tokens'])->middleware(['auth.apitoken', 'throttle:api-authenticated'])->name('auth.tokens');
 
     // Public read
-    Route::get('/posts', [PostController::class, 'index']);
-    Route::get('/posts/{slug}', [PostController::class, 'show']);
-    Route::get('/posts/{slug}/translations', [PostController::class, 'translations']);
-    Route::get('/categories', [CategoryController::class, 'index']);
-    Route::get('/categories/{slug}', [CategoryController::class, 'show']);
-    Route::get('/tags', [TagController::class, 'index']);
-    Route::get('/tags/{slug}', [TagController::class, 'show']);
-    Route::get('/authors', [AuthorController::class, 'index']);
-    Route::get('/authors/{username}', [AuthorController::class, 'show']);
-    Route::get('/media/{id}', [MediaController::class, 'show']);
+    Route::middleware('throttle:api-public')->group(function () {
+        Route::get('/posts', [PostController::class, 'index']);
+        Route::get('/posts/{slug}', [PostController::class, 'show']);
+        Route::get('/posts/{slug}/translations', [PostController::class, 'translations']);
+        Route::get('/categories', [CategoryController::class, 'index']);
+        Route::get('/categories/{slug}', [CategoryController::class, 'show']);
+        Route::get('/tags', [TagController::class, 'index']);
+        Route::get('/tags/{slug}', [TagController::class, 'show']);
+        Route::get('/authors', [AuthorController::class, 'index']);
+        Route::get('/authors/{username}', [AuthorController::class, 'show']);
+        Route::get('/media/{id}', [MediaController::class, 'show']);
+    });
 
     // Protected
-    Route::middleware('auth.apitoken')->group(function () {
+    Route::middleware(['auth.apitoken', 'throttle:api-authenticated'])->group(function () {
         // Posts CRUD
         Route::post('/posts', [PostController::class, 'store']);
         Route::put('/posts/{slug}', [PostController::class, 'update']);
