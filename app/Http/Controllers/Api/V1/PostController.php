@@ -44,7 +44,7 @@ class PostController extends Controller
         return response()->json($post->translations);
     }
 
-    public function store(Request $request): PostResource
+    public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
             'title'            => 'required|string|max:512',
@@ -58,7 +58,10 @@ class PostController extends Controller
         ]);
 
         $post = $this->posts->create($request->user(), $data);
-        return new PostResource($post);
+
+        return (new PostResource($post))
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function update(Request $request, string $slug): PostResource|JsonResponse

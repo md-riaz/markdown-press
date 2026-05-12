@@ -44,6 +44,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        \Illuminate\Support\Facades\RateLimiter::for('api', function (\Illuminate\Http\Request $request) {
+            return $request->user()
+                ? \Illuminate\Cache\RateLimiting\Limit::perMinute(300)->by($request->user()->id)
+                : \Illuminate\Cache\RateLimiting\Limit::perMinute(60)->by($request->ip());
+        });
     }
 }

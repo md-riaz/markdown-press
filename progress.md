@@ -1,0 +1,14 @@
+# Progress Tracking
+
+- [x] Explore implementation gaps against `docs/roadmap.md` using parallel sub-agents
+- [x] Complete missing Phase 2 shortcode handlers (`gallery`, `cta`, `toc`, `code`, `notice`, `columns`, `post_list`)
+- [x] Ensure shortcode handler registration in `config/shortcodes.php`
+- [x] Add and stabilize quality tests for content and API flows
+- [x] Fix API post CRUD feature tests to use correct token headers
+- [x] Return HTTP 201 for successful post creation API endpoint
+- [x] Validate with `php artisan migrate:fresh --seed --force`
+- [x] Validate with `php artisan test`
+- [x] Implement `GET /api/v1/auth/tokens` for authenticated token listing
+- [x] Implement `GET /api/v1/media/{id}` for public media metadata
+- [x] Add feature coverage for API token listing and media metadata endpoints
+- [ ] Continue next roadmap slice (security hardening, newsletter API parity, and admin completion)
