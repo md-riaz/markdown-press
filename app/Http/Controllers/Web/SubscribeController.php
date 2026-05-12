@@ -3,33 +3,29 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use App\Models\Subscriber;
+use App\Services\NewsletterService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class SubscribeController extends Controller
 {
+    public function __construct(private NewsletterService $newsletter) {}
+
     public function subscribe(Request $request)
     {
-        $request->validate(['email' => 'required|email|max:255']);
+        $validated = $request->validate([
+            'email' => 'required|email|max:255',
+            'name' => 'nullable|string|max:255',
+        ]);
 
-        Subscriber::firstOrCreate(
-            ['email' => $request->email],
-            [
-                'name'          => $request->name,
-                'token'         => Str::random(64),
-                'status'        => 'active',
-                'subscribed_at' => now(),
-            ]
-        );
+        $this->newsletter->subscribe($validated['email'], $validated['name'] ?? null);
 
-        return back()->with('success', 'Subscribed! Check your email.');
+        return back()->with('success', 'Subscription updated successfully.');
     }
 
     public function unsubscribe(string $token)
     {
-        $sub = Subscriber::where('token', $token)->firstOrFail();
-        $sub->update(['status' => 'unsubscribed', 'unsubscribed_at' => now()]);
+        $this->newsletter->unsubscribe($token);
+
         return view('newsletter.unsubscribed');
     }
 }

@@ -11,4 +11,6 @@
 - [x] Implement `GET /api/v1/auth/tokens` for authenticated token listing
 - [x] Implement `GET /api/v1/media/{id}` for public media metadata
 - [x] Add feature coverage for API token listing and media metadata endpoints
-- [ ] Continue next roadmap slice (security hardening, newsletter API parity, and admin completion)
+- [x] Implement newsletter service plus `POST /api/v1/newsletter/subscribe` and `DELETE /api/v1/newsletter/unsubscribe`
+- [x] Complete `SubscriberResource` CSV export and unsubscribe actions
+- [ ] Continue next roadmap slice (security hardening and remaining admin completion)

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\BuildController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\CommentController;
 use App\Http\Controllers\Api\V1\MediaController;
+use App\Http\Controllers\Api\V1\NewsletterController;
 use App\Http\Controllers\Api\V1\PostController;
 use App\Http\Controllers\Api\V1\TagController;
 use Illuminate\Support\Facades\Route;
@@ -51,6 +52,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::post('/media', [MediaController::class, 'store']);
         Route::delete('/media/{id}', [MediaController::class, 'destroy']);
         Route::patch('/media/{id}/star', [MediaController::class, 'star']);
+
+        // Newsletter
+        Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe']);
+        Route::delete('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe']);
 
         // AI
         Route::post('/ai/summary', [AIController::class, 'summary']);
