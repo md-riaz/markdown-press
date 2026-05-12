@@ -20,7 +20,7 @@ class ThrottleAuthenticatedApiRequests extends ThrottleRequests
         parent::__construct($limiter);
     }
 
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, $prefix = '')
     {
         $token = $request->bearerToken() ?? $request->header('X-API-Token');
 

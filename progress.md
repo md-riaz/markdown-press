@@ -15,4 +15,6 @@
 - [x] Complete `SubscriberResource` CSV export and unsubscribe actions
 - [x] Apply docs-based API rate limiting for public, authenticated, and auth token routes
 - [x] Add feature coverage for API and auth rate limiting responses
+- [x] Run the project locally in the container and capture preview screenshots for seeded public and admin pages
+- [x] Add a README preview section linking the captured screenshots
 - [ ] Continue next roadmap slice (security hardening headers and remaining admin completion)
