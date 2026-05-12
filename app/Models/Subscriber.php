@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class Subscriber extends Model
 {
@@ -30,11 +31,15 @@ class Subscriber extends Model
 
     public static function generateUniqueToken(): string
     {
-        do {
+        for ($attempt = 0; $attempt < 5; $attempt++) {
             $token = Str::random(64);
-        } while (static::where('token', $token)->exists());
 
-        return $token;
+            if (! static::where('token', $token)->exists()) {
+                return $token;
+            }
+        }
+
+        throw new RuntimeException('Unable to generate a unique subscriber token.');
     }
 
     public static function normalizeEmail(string $email): string

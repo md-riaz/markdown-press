@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Mail\NewsletterSubscriptionConfirmed;
 use App\Models\ApiToken;
 use App\Models\Subscriber;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -40,6 +42,8 @@ class NewsletterApiTest extends TestCase
 
     public function test_newsletter_subscribe_creates_active_subscriber(): void
     {
+        Mail::fake();
+
         $response = $this->postJson('/api/v1/newsletter/subscribe', [
             'email' => 'reader@example.com',
             'name' => 'Reader',
@@ -54,10 +58,16 @@ class NewsletterApiTest extends TestCase
             'name' => 'Reader',
             'status' => 'active',
         ]);
+
+        Mail::assertSent(NewsletterSubscriptionConfirmed::class, function ($mail): bool {
+            return $mail->hasTo('reader@example.com');
+        });
     }
 
     public function test_newsletter_subscribe_reactivates_existing_subscriber(): void
     {
+        Mail::fake();
+
         $subscriber = Subscriber::create([
             'name' => 'Reader',
             'email' => 'reader@example.com',
@@ -81,6 +91,43 @@ class NewsletterApiTest extends TestCase
         $this->assertSame('Updated Reader', $subscriber->name);
         $this->assertSame('active', $subscriber->status);
         $this->assertNull($subscriber->unsubscribed_at);
+        $this->assertTrue($subscriber->subscribed_at->isAfter(now()->subMinute()));
+        Mail::assertSent(NewsletterSubscriptionConfirmed::class, function ($mail): bool {
+            return $mail->hasTo('reader@example.com');
+        });
+    }
+
+    public function test_newsletter_subscribe_keeps_existing_subscription_date_for_active_subscriber(): void
+    {
+        Mail::fake();
+
+        $subscribedAt = now()->subDays(7);
+
+        Subscriber::create([
+            'name' => 'Reader',
+            'email' => 'reader@example.com',
+            'status' => 'active',
+            'token' => Str::random(64),
+            'subscribed_at' => $subscribedAt,
+        ]);
+
+        $response = $this->postJson('/api/v1/newsletter/subscribe', [
+            'email' => 'reader@example.com',
+            'name' => 'Reader',
+        ], $this->authHeaders());
+
+        $response->assertOk()
+            ->assertJsonPath('data.email', 'reader@example.com')
+            ->assertJsonPath('data.status', 'active');
+
+        $this->assertDatabaseHas('subscribers', [
+            'email' => 'reader@example.com',
+            'status' => 'active',
+        ]);
+        $this->assertEquals(
+            $subscribedAt->toDateTimeString(),
+            Subscriber::where('email', 'reader@example.com')->value('subscribed_at')
+        );
     }
 
     public function test_newsletter_unsubscribe_requires_authentication(): void

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\NewsletterSubscriptionConfirmed;
 use App\Models\Subscriber;
 use Illuminate\Support\Facades\Mail;
 
@@ -12,25 +13,19 @@ class NewsletterService
         $subscriber = Subscriber::firstOrNew([
             'email' => Subscriber::normalizeEmail($email),
         ]);
+        $shouldResetSubscriptionDate = ! $subscriber->exists || $subscriber->status === 'unsubscribed';
 
         $subscriber->fill([
             'name' => $name ?: $subscriber->name,
             'status' => 'active',
             'token' => $subscriber->token ?: Subscriber::generateUniqueToken(),
-            'subscribed_at' => now(),
+            'subscribed_at' => $shouldResetSubscriptionDate ? now() : $subscriber->subscribed_at,
             'unsubscribed_at' => null,
         ]);
 
         $subscriber->save();
 
-        Mail::raw(
-            "You're subscribed to the MarkdownPress newsletter.\n\nUnsubscribe: ".route('newsletter.unsubscribe', $subscriber->token),
-            function ($message) use ($subscriber): void {
-                $message
-                    ->to($subscriber->email, $subscriber->name)
-                    ->subject('Newsletter subscription confirmed');
-            }
-        );
+        Mail::to($subscriber->email, $subscriber->name)->send(new NewsletterSubscriptionConfirmed($subscriber));
 
         return $subscriber->fresh();
     }

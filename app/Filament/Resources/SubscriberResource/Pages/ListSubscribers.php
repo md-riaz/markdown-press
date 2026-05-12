@@ -57,6 +57,6 @@ class ListSubscribers extends ListRecords
             return null;
         }
 
-        return preg_match('/^[=\-+@]/', $value) ? "'".$value : $value;
+        return preg_match('/^[=\-+@]/', $value) ? "\t{$value}" : $value;
     }
 }
