@@ -1,22 +1,31 @@
 <?php
+
 namespace App\Modules\Shortcode\Handlers;
+
 use App\Contracts\ShortcodeHandlerContract;
 
 class ColumnsHandler implements ShortcodeHandlerContract
 {
-    public function name(): string { return 'columns'; }
+    public function name(): string
+    {
+        return 'columns';
+    }
 
     public function render(array $attributes, ?string $content): string
     {
-        $parts = explode('||', $content ?? '', 2);
-        $col1  = trim($parts[0] ?? '');
-        $col2  = trim($parts[1] ?? '');
+        $parts = collect(explode('||', (string) ($content ?? '')))
+            ->map(fn (string $part) => trim($part))
+            ->filter()
+            ->values();
 
-        return <<<HTML
-<div class="columns">
-  <div class="column">{$col1}</div>
-  <div class="column">{$col2}</div>
-</div>
-HTML;
+        if ($parts->isEmpty()) {
+            return '<!-- columns: empty content -->';
+        }
+
+        $columns = $parts->map(
+            fn (string $part) => '<div class="column">'.e($part).'</div>'
+        )->implode('');
+
+        return "<div class=\"columns\">{$columns}</div>";
     }
 }
