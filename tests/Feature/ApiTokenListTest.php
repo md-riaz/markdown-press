@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\ApiToken;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -23,15 +24,18 @@ class ApiTokenListTest extends TestCase
         $this->user = User::factory()->create();
         $this->rawToken = Str::random(64);
 
-        ApiToken::create([
+        $firstToken = ApiToken::create([
             'user_id' => $this->user->id,
             'name' => 'first-token',
             'token' => hash('sha256', $this->rawToken),
             'abilities' => ['*'],
             'expires_at' => now()->addYear(),
-            'created_at' => now()->subMinute(),
-            'updated_at' => now()->subMinute(),
         ]);
+
+        $firstToken->forceFill([
+            'created_at' => CarbonImmutable::parse('2026-01-01 00:00:00'),
+            'updated_at' => CarbonImmutable::parse('2026-01-01 00:00:00'),
+        ])->saveQuietly();
     }
 
     private function authHeaders(): array
@@ -49,25 +53,31 @@ class ApiTokenListTest extends TestCase
     {
         $otherUser = User::factory()->create();
 
-        ApiToken::create([
+        $otherToken = ApiToken::create([
             'user_id' => $otherUser->id,
             'name' => 'other-token',
             'token' => hash('sha256', Str::random(64)),
             'abilities' => ['*'],
             'expires_at' => now()->addYear(),
-            'created_at' => now()->subSeconds(30),
-            'updated_at' => now()->subSeconds(30),
         ]);
 
-        ApiToken::create([
+        $otherToken->forceFill([
+            'created_at' => CarbonImmutable::parse('2026-01-02 00:00:00'),
+            'updated_at' => CarbonImmutable::parse('2026-01-02 00:00:00'),
+        ])->saveQuietly();
+
+        $secondToken = ApiToken::create([
             'user_id' => $this->user->id,
             'name' => 'second-token',
             'token' => hash('sha256', Str::random(64)),
             'abilities' => ['*'],
             'expires_at' => now()->addYear(),
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
+
+        $secondToken->forceFill([
+            'created_at' => CarbonImmutable::parse('2026-01-03 00:00:00'),
+            'updated_at' => CarbonImmutable::parse('2026-01-03 00:00:00'),
+        ])->saveQuietly();
 
         $response = $this->getJson('/api/v1/auth/tokens', $this->authHeaders());
 

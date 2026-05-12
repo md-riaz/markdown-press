@@ -58,7 +58,6 @@ class AuthController extends Controller
         $tokens = ApiToken::query()
             ->where('user_id', $request->user()->id)
             ->orderByDesc('created_at')
-            ->orderByDesc('id')
             ->get(['id', 'name', 'abilities', 'last_used_at', 'expires_at', 'created_at', 'updated_at']);
 
         return response()->json(['data' => $tokens]);
