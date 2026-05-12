@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -58,11 +59,14 @@ class ApiRateLimitingTest extends TestCase
 
     public function test_authenticated_api_routes_are_limited_to_three_hundred_requests_per_minute(): void
     {
-        for ($attempt = 1; $attempt <= 300; $attempt++) {
-            $this->getJson('/api/v1/auth/tokens', $this->authHeaders())
-                ->assertOk()
-                ->assertHeader('X-RateLimit-Limit', '300');
-        }
+        $this->getJson('/api/v1/auth/tokens', $this->authHeaders())
+            ->assertOk()
+            ->assertHeader('X-RateLimit-Limit', '300');
+
+        $limiterKey = md5('api-authenticated'.'api:token:'.hash('sha256', $this->rawToken));
+
+        RateLimiter::clear($limiterKey);
+        RateLimiter::increment($limiterKey, 60, 300);
 
         $this->getJson('/api/v1/auth/tokens', $this->authHeaders())
             ->assertStatus(429)

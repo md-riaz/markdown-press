@@ -56,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
             $identifier = $request->bearerToken() ?? $request->header('X-API-Token');
 
             if ($identifier === null) {
-                return Limit::perMinute(300)->by('api:missing-token:'.$request->ip());
+                return Limit::perMinute(60)->by('api:missing-token:'.$request->ip());
             }
 
             $hashedIdentifier = hash('sha256', $identifier);
