@@ -17,13 +17,13 @@ class Subscriber extends Model
     protected static function booted(): void
     {
         static::creating(function (Subscriber $subscriber): void {
-            $subscriber->email = Str::lower(trim($subscriber->email));
+            $subscriber->email = static::normalizeEmail($subscriber->email);
             $subscriber->token ??= static::generateUniqueToken();
             static::syncLifecycleState($subscriber);
         });
 
         static::saving(function (Subscriber $subscriber): void {
-            $subscriber->email = Str::lower(trim($subscriber->email));
+            $subscriber->email = static::normalizeEmail($subscriber->email);
             static::syncLifecycleState($subscriber);
         });
     }
@@ -35,6 +35,11 @@ class Subscriber extends Model
         } while (static::where('token', $token)->exists());
 
         return $token;
+    }
+
+    public static function normalizeEmail(string $email): string
+    {
+        return Str::lower(trim($email));
     }
 
     private static function syncLifecycleState(Subscriber $subscriber): void

@@ -19,7 +19,7 @@ class NewsletterController extends Controller
             'name' => 'nullable|string|max:255',
         ]);
 
-        $existing = Subscriber::where('email', strtolower($validated['email']))->exists();
+        $existing = Subscriber::where('email', Subscriber::normalizeEmail($validated['email']))->exists();
         $subscriber = $this->newsletter->subscribe($validated['email'], $validated['name'] ?? null);
 
         return response()->json([

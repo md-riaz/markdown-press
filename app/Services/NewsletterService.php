@@ -4,14 +4,13 @@ namespace App\Services;
 
 use App\Models\Subscriber;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 
 class NewsletterService
 {
     public function subscribe(string $email, ?string $name = null): Subscriber
     {
         $subscriber = Subscriber::firstOrNew([
-            'email' => Str::lower(trim($email)),
+            'email' => Subscriber::normalizeEmail($email),
         ]);
 
         $subscriber->fill([
@@ -50,7 +49,7 @@ class NewsletterService
 
     public function unsubscribeByEmail(string $email): Subscriber
     {
-        $subscriber = Subscriber::where('email', Str::lower(trim($email)))->firstOrFail();
+        $subscriber = Subscriber::where('email', Subscriber::normalizeEmail($email))->firstOrFail();
 
         if ($subscriber->status !== 'unsubscribed') {
             $subscriber->update([
