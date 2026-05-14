@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{{ $metaDescription ?? \App\Models\Setting::get('general','site_description') }}">
     <title>{{ $title ?? \App\Models\Setting::get('general','site_name','MarkdownPress') }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3/dist/tailwind.min.css">
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        <script src="https://cdn.tailwindcss.com?plugins=typography,line-clamp"></script>
+    @endif
     @stack('head')
 </head>
 <body class="bg-gray-50 text-gray-900 antialiased">
